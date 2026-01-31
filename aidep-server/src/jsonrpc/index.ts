@@ -1,13 +1,14 @@
 import {z, ZodObject, ZodTuple} from "zod";
 
+export const Version = z.literal("2.0");
+
 export const Id = z.union([z.string(), z.number().int(), z.null()]);
-export type Id = z.infer<typeof Id>;
 
 export const Request = <T extends ZodTuple<any> | ZodObject<any> | undefined = undefined>(
   paramsSchema?: T
 ) => {
   const base = {
-    jsonrpc: z.literal("2.0"),
+    jsonrpc: Version,
     method: z.string(),
     id: Id.optional(),
   };
@@ -25,7 +26,6 @@ export const Request = <T extends ZodTuple<any> | ZodObject<any> | undefined = u
 export type Request<T extends ZodTuple<any> | ZodObject<any> | undefined = undefined> =
   z.infer<ReturnType<typeof Request<T>>>;
 
-// Error codes
 export const ErrorCode = {
   ParseError: -32700,
   InvalidRequest: -32600,
@@ -34,7 +34,6 @@ export const ErrorCode = {
   InternalError: -32603,
 } as const;
 
-// Error object schema
 export const ErrorObject = z.object({
   code: z.number().int(),
   message: z.string(),
@@ -43,11 +42,10 @@ export const ErrorObject = z.object({
 
 export type ErrorObject = z.infer<typeof ErrorObject>;
 
-// Success response
 export const SuccessResponse = <T extends z.ZodTypeAny>(
   resultSchema: T
 ) => z.object({
-  jsonrpc: z.literal("2.0"),
+  jsonrpc: Version,
   result: resultSchema,
   id: Id,
 }).strict().refine(
@@ -58,16 +56,14 @@ export const SuccessResponse = <T extends z.ZodTypeAny>(
 export type SuccessResponse<T extends z.ZodTypeAny> =
   z.infer<ReturnType<typeof SuccessResponse<T>>>;
 
-// Error response
 export const ErrorResponse = z.object({
-  jsonrpc: z.literal("2.0"),
+  jsonrpc: Version,
   error: ErrorObject,
   id: Id,
 }).strict();
 
 export type ErrorResponse = z.infer<typeof ErrorResponse>;
 
-// Response is either success or error
 export const Response = <T extends z.ZodTypeAny>(
   resultSchema: T
 ) => z.union([SuccessResponse(resultSchema), ErrorResponse]);
