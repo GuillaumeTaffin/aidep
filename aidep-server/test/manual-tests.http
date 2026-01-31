@@ -1,0 +1,13 @@
+###
+GET http://localhost:3000
+
+###
+# @name helloWorldWebSocket
+# Sends a message and waits for the server to echo it back
+WEBSOCKET ws://localhost:3000/ws
+
+Hello from HTTP Client!
+=== wait-for-server
+// Expected response: "You said: Hello from HTTP Client!"
+
+###
